@@ -1,0 +1,35 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getLaunchBy, getLatestLaunches } from "../../services/spaceZ";
+import { type Doc } from "../../types/api";
+import Layout from "../../layouts/Layout.astro"
+
+// como tenemos output en hybrid, podemos especificar que páginas
+// se renderizaran desde el servidor
+export const prerender = false
+
+const { id } = Astro.params;
+
+let launch: Doc | undefined = undefined;
+
+if (id) {
+  launch = await getLaunchBy({ id });
+  console.log(launch);
+}
+// si nuestra página fuera estatica
+// export const getStaticPaths = (async() => {
+
+// 	const launches = await getLatestLaunches()
+// 	const idsLaunches = launches.map(launch => { return {params: {id :launch.id}} })
+
+//   return idsLaunches;
+// }) satisfies GetStaticPaths;
+---
+
+<Layout title={`lanzamiento ${launch?.id}` || "lanzamiento"}>
+  <article class="flex gap-y-4 flex-col w-52 h-auto">
+		<img src={launch?.links.patch.small} alt={launch?.name}>
+    <h2 class="text-4xl text-white font-bold">Launch #{launch && launch.flight_number}</h2>
+		<p class="text-lg">{launch?.details}</p>
+  </article>
+</Layout>
